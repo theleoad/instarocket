@@ -6,36 +6,34 @@ const fs = require('fs');
 module.exports = {
     async index(req, res) {
         const posts = await Post.find().sort('-createdAt', );
-
         return res.json(posts);
     },
 
     async store(req, res) {
-        const { author, place, description, hashtags } = req.body;
-        const { filename: image } = req.file;
-        
-        const [name] = image.split('.');
-        const fileName = `${name}.jpg`;
+        const { author, place, desctiption, hashtags } = req.body
+        const { filename: image } = req.file
+
+        const post = await Post.create({
+            author, place, desctiption, hashtags, image
+        })
+
+        const [ name ] = image.split('.')
+        const fileName = `${post._id}.jpg`
 
         await sharp(req.file.path)
             .resize(500)
-            .jpeg({ quality: 70})
+            .jpeg({ quality: 80 })
             .toFile(
                 path.resolve(req.file.destination, 'resized', fileName)
-            )
+        )
 
-        fs.unlinkSync(req.file.path);    
+        post.image = fileName
+        post.save()
 
-        const post = await Post.create({
-            author,
-            place,
-            description,
-            hashtags,
-            fileName,
-        });
+        fs.unlinkSync(req.file.path)
 
-        req.io.emit('post', post);
+        req.io.emit('post', post)
 
-        return res.json(post);
+        return res.json(post)
     }
 };
