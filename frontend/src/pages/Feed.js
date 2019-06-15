@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import api from '../services/api';
 
 import './Feed.css';
 
@@ -8,55 +9,44 @@ import comment from '../assets/comment.svg';
 import send from '../assets/send.svg';
 
 class Feed extends Component {
+    state = {
+        feed: [],
+    };
+    
+    async componentDidMount() {
+        const response = await api.get('posts');
+
+        this.setState({ feed: response.data });
+    }
+
     render() {
         return (
             <section id="post-list">
-                <article>
+                { this.state.feed.map(post => (
+                    <article>
                     <header>
                         <div className="user-info">
-                            <span>Leo</span>
-                            <span className="place">Anápolis</span>
+                            <span>{post.author}</span>
+                            <span className="place">{post.place}</span>
                         </div>
-                        
-                        <img src={more} alt="Mis" />
+                        <img src={more} alt="Mais" />
                     </header>
-                    <img src="http://localhost:3333/files/catalina.jpg" alt=""/>
+                    <img src={`http://localhost:3333/files/${post.image}`} alt=""/>
                     <footer>
                         <div className="actions">
                             <img src={like} alt=""/>
                             <img src={comment} alt=""/>
                             <img src={send} alt=""/>
                        </div>
-                       <strong>900 curtidas</strong>
+                       <strong>{post.likes} curtidas</strong>
                        <p>
-                           Um post muito massa do Leo!
-                            <span>#react #top</span>
+                           {post.description}
+                            <span>{post.hashtags}</span>
                        </p>
                     </footer>
                 </article>
-                <article>
-                    <header>
-                        <div className="user-info">
-                            <span>Leo</span>
-                            <span className="place">Anápolis</span>
-                        </div>
-                        
-                        <img src={more} alt="Mis" />
-                    </header>
-                    <img src="http://localhost:3333/files/catalina.jpg" alt=""/>
-                    <footer>
-                        <div className="actions">
-                            <img src={like} alt=""/>
-                            <img src={comment} alt=""/>
-                            <img src={send} alt=""/>
-                       </div>
-                       <strong>900 curtidas</strong>
-                       <p>
-                           Um post muito massa do Leo!
-                            <span>#react #top</span>
-                       </p>
-                    </footer>
-                </article>
+                )) }
+                
             </section>
         );
     }
