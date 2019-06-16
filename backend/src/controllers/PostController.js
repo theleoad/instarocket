@@ -10,11 +10,11 @@ module.exports = {
     },
 
     async store(req, res) {
-        const { author, place, desctiption, hashtags } = req.body
+        const { author, place, description, hashtags } = req.body
         const { filename: image } = req.file
 
         const post = await Post.create({
-            author, place, desctiption, hashtags, image
+            author, place, description, hashtags, image
         })
 
         const [ name ] = image.split('.')
